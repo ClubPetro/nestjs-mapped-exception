@@ -3,8 +3,9 @@ import { HttpStatus } from '@nestjs/common';
 import { MappedExceptionError } from './mapped-exception-error.class';
 
 const prepareCode = (code: number, suffix?: string) => {
-  return `${globalThis.MAPPED_EXCEPTION_PREFIX ||
-    'ERR'}${code.toString().padStart(4, '0')}${suffix}`;
+  return `${
+    globalThis.MAPPED_EXCEPTION_PREFIX || 'ERR'
+  }${code.toString().padStart(4, '0')}${suffix}`;
 };
 
 const DATABASE = {
