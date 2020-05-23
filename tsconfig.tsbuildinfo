@@ -1132,7 +1132,7 @@
         "affectsGlobalScope": false
       },
       "./src/filters/mapped-exception.filter.ts": {
-        "version": "ed52f88bd2977fb831bbb39a49235101370b1c8938e59e411d1aac26ce429c8f",
+        "version": "4989a1b65a09e66b51058330bfbb30d48ad6f939fba066146c11c46c1bfd3c9e",
         "signature": "cd7adb006aab30f98a7368b91f9f0f944bb24b02a78aba4a6575ceb0f5d394c1",
         "affectsGlobalScope": false
       },
@@ -1142,7 +1142,7 @@
         "affectsGlobalScope": false
       },
       "./src/__tests__/mapped-exception.class.spec.ts": {
-        "version": "2acfb72f46e9371a69aacf8f7dab6294d38d7db8c4686b07a7035b600bb63608",
+        "version": "53956d668cec4aa025df2799b0764a18ba0986b0f1a2a517bcd33757444d288f",
         "signature": "43affdbcc2eaa8a3b5a05363fbe0577b61ffe0608a5d2eb42ed0ae924a7a13f6",
         "affectsGlobalScope": false
       },
@@ -4187,7 +4187,8 @@
         "./node_modules/@types/node/fs.d.ts",
         "./node_modules/@types/node/ts3.2/fs.d.ts",
         "./node_modules/@types/node/ts3.2/util.d.ts",
-        "./node_modules/@types/node/util.d.ts"
+        "./node_modules/@types/node/util.d.ts",
+        "./src/core/mapped-exception.class.ts"
       ],
       "./src/core/mapped-exception-error.class.ts": [
         "./node_modules/@types/graceful-fs/index.d.ts",
@@ -7212,19 +7213,7 @@
       "./node_modules/typescript/lib/lib.es2020.bigint.d.ts",
       "./node_modules/typescript/lib/lib.es5.d.ts",
       "./node_modules/typescript/lib/lib.esnext.intl.d.ts",
-      [
-        "./src/__tests__/mapped-exception.class.spec.ts",
-        [
-          {
-            "file": "./src/__tests__/mapped-exception.class.spec.ts",
-            "start": 32,
-            "length": 36,
-            "messageText": "Cannot find module '../src/core/mapped-exception.class' or its corresponding type declarations.",
-            "category": 1,
-            "code": 2307
-          }
-        ]
-      ],
+      "./src/__tests__/mapped-exception.class.spec.ts",
       "./src/core/mapped-exception-error.class.ts",
       "./src/core/mapped-exception.class.ts",
       "./src/core/mapped-exception.errors.ts",
