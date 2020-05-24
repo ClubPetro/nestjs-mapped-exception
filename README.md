@@ -1,25 +1,30 @@
 # nestjs-mapped-exception
+
 It helps handle with exception on your nestjs application.
-Using this package, we can define code for our exception separating by features, where each exception will have a code (four digits), and prefix code and suffix code (see how to setup it bellow). 
+Using this package, we can define code for our exception separating by features, where each exception will have a code (four digits), and prefix code and suffix code (see how to setup it bellow).
 For example, if we have a feature called `user`, a exception with code 1 and a prefix set up as `ERR`, we will get the code `ERR0001USE`
 
 ## Requirements
+
 - NodeJS 10.13.0 or later
 - NestJS 7 or later
 
 ## Usage
 
-
 ### Instalation
+
 ```
 $ npm install -- save nestjs-mapped-exception
 ```
+
 or yarn
+
 ```
 $ yarn add nestjs-mapped-exception
 ```
 
 ### Setup
+
 To setup the exception to the feature module, we have import the `MappedExceptionModule` in our module like this:
 
 ```ts
@@ -39,6 +44,8 @@ import { MappedExceptionModule } from 'nestjs-mapped-exception';
 export class UserModule {}
 ```
 
+_You also can use environment variable to set prefix with **MAPPED_EXCEPTION_PREFIX=** on your `.env` file_
+
 After, we need to create our exception file
 
 ```ts
@@ -54,8 +61,8 @@ export class UserException {
     statusCode: HttpStatus.BAD_REQUEST,
   };
 }
-
 ```
+
 The status code is used for `REST` context, for `GraphQL` or `Microservice` contex, maybe we cannot use that.
 
 Then we need to inject our exception in the service layer like this:
@@ -85,6 +92,7 @@ export class UserController {
   // ...
 }
 ```
+
 This can be used on resolvers in GraphQl context
 
 This way, our `MappedExceptionFilter` will handle with all error generated on the service layer

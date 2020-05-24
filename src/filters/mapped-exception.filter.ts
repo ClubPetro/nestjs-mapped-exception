@@ -12,8 +12,6 @@ import { MappedExceptionError } from '../core/mapped-exception-error.class';
 
 @Catch()
 export class MappedExceptionFilter implements ExceptionFilter {
-  defaultExceptionCode: string = DEFAULT_EXCEPTIONS.DEFAULT.code.toString();
-
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
@@ -25,7 +23,7 @@ export class MappedExceptionFilter implements ExceptionFilter {
       code,
     } = this.getStatusAndMessage(exception);
 
-    const contextType = host.getType();
+    const contextType: any = host.getType();
 
     if (contextType === 'http') {
       return this.handleRestContext(request, response, status, message, code);
@@ -34,12 +32,19 @@ export class MappedExceptionFilter implements ExceptionFilter {
     if (contextType === 'rpc') {
       return this.handleRpcContext(code, message);
     }
+
+    if (contextType === 'graphql') {
+      return this.graphqlFormatError(status, message, code);
+    }
   }
 
   private getStatusAndMessage(
     exception,
   ): { status: number; message: string; code: string } {
-    if (exception instanceof MappedExceptionError) {
+    if (
+      exception instanceof MappedExceptionError ||
+      exception.constructor.name === 'MappedExceptionError' // This is used for graphql reasons
+    ) {
       const { code, message, statusCode } = exception.exception;
       return {
         code: code.toString(),
@@ -47,18 +52,42 @@ export class MappedExceptionFilter implements ExceptionFilter {
         status: statusCode,
       };
     }
-    if (exception instanceof HttpException) {
+    if (
+      exception instanceof HttpException ||
+      exception.constructor.name === 'HttpException' // This is used for graphql reasons
+    ) {
       return {
         code: this.getCodeFromHttpException(exception),
-        message: exception.message,
+        message: Array.isArray(exception.message)
+          ? exception.message.join('; ')
+          : exception.message,
         status: exception.getStatus(),
       };
     }
 
+    let message = DEFAULT_EXCEPTIONS.VALIDATION.DEFAULT.message;
+    if (exception.response && exception.response.message) {
+      message = exception.response.message;
+    } else if (exception.message) {
+      message = exception.message;
+    }
+
+    let status = DEFAULT_EXCEPTIONS.DEFAULT.statusCode;
+    if (exception.response && exception.response.statusCode) {
+      status = exception.response.statusCode;
+    } else if (exception.status) {
+      status = exception.status;
+    }
+
+    let code = DEFAULT_EXCEPTIONS.DEFAULT.code.toString();
+    if (exception.message && exception.message.indexOf('Bad Request') !== -1) {
+      code = DEFAULT_EXCEPTIONS.VALIDATION.DEFAULT.code.toString();
+    }
+
     return {
-      code: this.defaultExceptionCode,
-      message: exception.message,
-      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      code,
+      message: Array.isArray(message) ? message.join('; ') : message,
+      status: status,
     };
   }
 
@@ -86,6 +115,17 @@ export class MappedExceptionFilter implements ExceptionFilter {
     if (exception instanceof BadRequestException) {
       return DEFAULT_EXCEPTIONS.VALIDATION.DEFAULT.code.toString();
     }
-    return this.defaultExceptionCode;
+    return DEFAULT_EXCEPTIONS.DEFAULT.code.toString();
+  }
+
+  private graphqlFormatError(status: number, message: string, code: string) {
+    return new HttpException(
+      {
+        message,
+        code,
+        statusCode: status,
+      },
+      status,
+    );
   }
 }

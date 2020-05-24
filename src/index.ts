@@ -6,6 +6,7 @@ import { DEFAULT_EXCEPTIONS } from './core/mapped-exception.errors';
 import { MappedException } from './core/mapped-exception.class';
 import { MappedExceptionItem } from './types/mapped-exceptions-item.class';
 import { MappedExceptionFilter } from './filters/mapped-exception.filter';
+import { MappedExceptionError } from './core/mapped-exception-error.class';
 
 export {
   MappedExceptionModule,
@@ -14,4 +15,5 @@ export {
   MappedException,
   MappedExceptionItem,
   MappedExceptionFilter,
+  MappedExceptionError,
 };
