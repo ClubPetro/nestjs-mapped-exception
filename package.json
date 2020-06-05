@@ -1,6 +1,6 @@
 {
   "name": "nestjs-mapped-exception",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Mapped Exceptions for NestJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

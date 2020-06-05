@@ -1,5 +1,5 @@
-import { MappedExceptionItem } from '../types/mapped-exceptions-item.class';
 import { HttpStatus } from '@nestjs/common';
+import { MappedExceptionItem } from '../types/mapped-exceptions-item.class';
 import { MappedExceptionError } from './mapped-exception-error.class';
 
 const prepareCode = (code: number, suffix?: string) => {
@@ -27,6 +27,14 @@ const VALIDATION = {
       throw new MappedExceptionError(VALIDATION.DEFAULT);
     },
   }),
+  INVALID_TYPE: new MappedExceptionItem({
+    message: 'The variable type is invalid',
+    code: prepareCode(2, 'VAL'),
+    statusCode: HttpStatus.BAD_REQUEST,
+    throw: () => {
+      throw new MappedExceptionError(VALIDATION.INVALID_TYPE);
+    },
+  }),
 };
 const OPERATION = {
   DEFAULT: new MappedExceptionItem({
@@ -48,9 +56,24 @@ const DEFAULT = new MappedExceptionItem({
   },
 });
 
+const custom = (exception: MappedExceptionItem | string, code: number) => {
+  if (exception instanceof MappedExceptionItem) {
+    const exceptionItem = { ...exception, code: prepareCode(code, 'CST') };
+    return new MappedExceptionItem({ ...DEFAULT, ...exceptionItem });
+  }
+
+  const customExceptionItem = new MappedExceptionItem({
+    ...DEFAULT,
+    message: exception,
+    code: prepareCode(code, 'CST'),
+  });
+  return new MappedExceptionItem(customExceptionItem);
+};
+
 export const DEFAULT_EXCEPTIONS = {
   DEFAULT,
   DATABASE,
   VALIDATION,
   OPERATION,
+  Custom: custom,
 };
