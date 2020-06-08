@@ -6,7 +6,7 @@ For example, if we have a feature called `user`, a exception with code 1 and a p
 
 ## Requirements
 
-- NodeJS 10.13.0 or later
+- NodeJS 12.0.0 or later
 - NestJS 7 or later
 
 ## Usage
