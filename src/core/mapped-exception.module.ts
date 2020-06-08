@@ -1,4 +1,4 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { MappedException } from './mapped-exception.class';
 
 export class MappedExceptionOptions {
@@ -9,15 +9,21 @@ export class MappedExceptionOptions {
 @Module({})
 export class MappedExceptionModule {
   static forFeature<T>(
-    exception: T,
+    exception: T | object | object[],
     options: MappedExceptionOptions = { prefix: 'ERR' },
   ): DynamicModule {
-    const providers = [
-      {
-        provide: MappedException,
-        useValue: new MappedException<T>(exception, options),
-      },
-    ];
+    let exceptionArr: (T | object)[];
+
+    if (Array.isArray(exception)) {
+      exceptionArr = exception;
+    } else {
+      exceptionArr = [exception];
+    }
+
+    const providers = exceptionArr.map((exception) => ({
+      provide: MappedException,
+      useValue: new MappedException<T>(exception, options),
+    }));
 
     return {
       providers,
