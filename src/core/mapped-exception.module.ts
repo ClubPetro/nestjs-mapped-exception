@@ -40,6 +40,7 @@ export class MappedExceptionModule {
     });
 
     return {
+      global: true,
       providers: providers,
       exports: providers,
       module: MappedExceptionModule,
