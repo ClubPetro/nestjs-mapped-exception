@@ -9,24 +9,38 @@ export class MappedExceptionOptions {
 @Module({})
 export class MappedExceptionModule {
   static forFeature<T>(
-    exception: T | object | object[],
+    exception: T | object,
     options: MappedExceptionOptions = { prefix: 'ERR' },
   ): DynamicModule {
-    let exceptionArr: (T | object)[];
-
-    if (Array.isArray(exception)) {
-      exceptionArr = exception;
-    } else {
-      exceptionArr = [exception];
-    }
-
-    const providers = exceptionArr.map((exception) => ({
+    const provider = {
       provide: MappedException,
       useValue: new MappedException<T>(exception, options),
-    }));
+    };
 
     return {
-      providers,
+      providers: [provider],
+      exports: [provider],
+      module: MappedExceptionModule,
+    };
+  }
+
+  static forRoot(
+    exceptions: object[],
+    options: MappedExceptionOptions = { prefix: 'ERR' },
+  ): DynamicModule {
+    const providers = exceptions.map((exception: any) => {
+      const exceptionInstance = new exception();
+      return {
+        provide: exception,
+        useValue: new MappedException<typeof exceptionInstance>(
+          exception,
+          options,
+        ),
+      };
+    });
+
+    return {
+      providers: providers,
       exports: providers,
       module: MappedExceptionModule,
     };
