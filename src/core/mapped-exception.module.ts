@@ -10,11 +10,14 @@ export class MappedExceptionOptions {
 export class MappedExceptionModule {
   static forFeature<T>(
     exception: T | object,
-    options: MappedExceptionOptions = { prefix: 'ERR' },
+    options: MappedExceptionOptions,
   ): DynamicModule {
+    const prefix =
+      options.prefix || process.env.EXCEPTION_ERROR_PREFIX || 'ERR';
+
     const provider = {
       provide: MappedException,
-      useValue: new MappedException<T>(exception, options),
+      useValue: new MappedException<T>(exception, { ...options, prefix }),
     };
 
     return {

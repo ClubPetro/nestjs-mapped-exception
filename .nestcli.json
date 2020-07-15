@@ -1,0 +1,9 @@
+{
+  "language": "ts",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src/app",
+  "entryFile": "app/main.js",
+  "compilerOptions": {
+    "assets": ["**/*.proto"]
+  }
+}

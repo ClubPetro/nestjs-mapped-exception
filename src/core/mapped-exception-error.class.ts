@@ -1,4 +1,4 @@
-import { MappedExceptionItem } from '../types/mapped-exceptions-item.class';
+import { MappedExceptionItem } from './types/mapped-exceptions-item.class';
 
 export class MappedExceptionError {
   exception: MappedExceptionItem;

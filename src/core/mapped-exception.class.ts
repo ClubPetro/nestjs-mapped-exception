@@ -1,6 +1,6 @@
-import { MappedExceptionItem } from '../types/mapped-exceptions-item.class';
 import { MappedExceptionError } from './mapped-exception-error.class';
 import { MappedExceptionOptions } from './mapped-exception.module';
+import { MappedExceptionItem } from './types/mapped-exceptions-item.class';
 
 export class MappedException<T> {
   ERRORS: T;

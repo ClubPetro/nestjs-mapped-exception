@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package grpcpackage;
+
+service RpcService {
+	rpc databaseError (empty) returns (empty) {}
+	rpc create (createInput) returns (createOutput) {}
+	rpc applicationError (empty) returns (empty) {}
+	rpc exceptionError (empty) returns (empty) {}
+	rpc httpException (empty) returns (empty) {}
+}
+
+message createInput{
+  string name = 1;
+  string email = 2;
+  int32 age = 3;
+}
+message createOutput{
+	string name = 1;
+	string email = 2;
+  int32 age = 3;
+}
+
+message empty {}

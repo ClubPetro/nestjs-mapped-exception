@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
-import { MappedExceptionItem } from '../types/mapped-exceptions-item.class';
 import { MappedExceptionError } from './mapped-exception-error.class';
+import { MappedExceptionItem } from './types/mapped-exceptions-item.class';
 
 const prepareCode = (code: number, suffix?: string) => {
   return `${
