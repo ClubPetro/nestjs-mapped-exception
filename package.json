@@ -69,6 +69,6 @@
     "typescript": "^3.9.3"
   },
   "files": [
-    "dist/**/*"
+    "dist/core/**/*"
   ]
 }
