@@ -24,7 +24,7 @@ export class RpcController implements OnModuleInit {
 
   @Get('database-error')
   async databaseError() {
-    return await this.rpcService.databaseError().toPromise();
+    return await this.rpcService.databaseError({}).toPromise();
   }
 
   @Post('create')
@@ -34,16 +34,16 @@ export class RpcController implements OnModuleInit {
 
   @Get('application-error')
   async applicationError() {
-    return await this.rpcService.applicationError().toPromise();
+    return await this.rpcService.applicationError({}).toPromise();
   }
 
   @Get('exception-error')
   async exceptionError() {
-    return await this.rpcService.exceptionError().toPromise();
+    return await this.rpcService.exceptionError({}).toPromise();
   }
 
   @Get('http-exception')
   async httpException() {
-    return await this.rpcService.httpException().toPromise();
+    return await this.rpcService.httpException({}).toPromise();
   }
 }

@@ -3,15 +3,17 @@ import {
   HttpException as NestHttpException,
   HttpStatus,
   Injectable,
+  UseFilters,
 } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MappedException } from '../../../core';
+import { MappedException, MappedExceptionFilter } from '../../../core';
 import { User } from '../user/user.entity';
 import { RpcException } from './rpc.exception';
 
 @Controller()
+@UseFilters(new MappedExceptionFilter())
 @Injectable()
 export class RpcService {
   constructor(
