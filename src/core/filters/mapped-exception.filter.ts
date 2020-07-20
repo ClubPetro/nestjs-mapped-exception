@@ -96,7 +96,7 @@ export class MappedExceptionFilter implements ExceptionFilter {
       return {
         code: this.defaultApplicationErrorPrefix,
         message: exception.message,
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        status: exception.status || HttpStatus.INTERNAL_SERVER_ERROR,
       };
     }
   }

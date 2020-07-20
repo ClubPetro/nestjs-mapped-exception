@@ -8,7 +8,7 @@ import {
   UseFilters,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { MappedExceptionFilter } from '../../../core';
+import { MappedExceptionFilter } from '../../..';
 import { User } from '../user/user.entity';
 
 @Controller('rpc')

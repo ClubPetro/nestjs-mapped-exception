@@ -4,7 +4,7 @@ import { MappedExceptionItem } from './types/mapped-exceptions-item.class';
 
 const prepareCode = (code: number, suffix?: string) => {
   return `${
-    globalThis.MAPPED_EXCEPTION_PREFIX || 'ERR'
+    globalThis.EXCEPTION_ERROR_PREFIX || 'ERR'
   }${code.toString().padStart(4, '0')}${suffix}`;
 };
 

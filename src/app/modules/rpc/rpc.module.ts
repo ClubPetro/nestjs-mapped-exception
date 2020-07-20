@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
-import { MappedExceptionModule } from '../../../core';
+import { MappedExceptionModule } from '../../..';
 import ormConfig from '../../ormconfig';
 import { User } from '../user/user.entity';
 import { RpcException } from './rpc.exception';

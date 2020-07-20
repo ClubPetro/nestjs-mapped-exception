@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UseFilters } from '@nestjs/common';
-import { MappedExceptionFilter } from '../../../core';
+import { MappedExceptionFilter } from '../../..';
 import { User } from '../user/user.entity';
 import { HttpService } from './http.service';
 

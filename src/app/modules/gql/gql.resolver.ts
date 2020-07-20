@@ -9,7 +9,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { IsEmail, IsNotEmpty } from 'class-validator';
-import { MappedExceptionFilter } from '../../../core';
+import { MappedExceptionFilter } from '../../..';
 import { GqlService } from './gql.service';
 
 @InputType()

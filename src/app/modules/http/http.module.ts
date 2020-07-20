@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MappedExceptionModule } from '../../../core';
+import { MappedExceptionModule } from '../../..';
 import { User } from '../user/user.entity';
 import { HttpController } from './http.controller';
 import { HttpException } from './http.exception';

@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { MappedExceptionItem } from '../../../core';
+import { MappedExceptionItem } from '../../..';
 
 export class RpcException {
   NOT_FOUND: MappedExceptionItem = {

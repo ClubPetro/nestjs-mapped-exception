@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MappedExceptionModule } from '../../../core';
+import { MappedExceptionModule } from '../../..';
 import { User } from '../user/user.entity';
 import { GqlException } from './gql.exception';
 import { GqlResolver } from './gql.resolver';

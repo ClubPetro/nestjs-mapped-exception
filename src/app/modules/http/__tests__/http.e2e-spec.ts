@@ -7,7 +7,7 @@ import {
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MappedExceptionModule } from '../../../../core';
+import { MappedExceptionModule } from '../../../..';
 import ormConfig from '../../../ormconfig';
 import { User } from '../../user/user.entity';
 import { HttpException } from '../http.exception';

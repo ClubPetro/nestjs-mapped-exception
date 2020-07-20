@@ -44,7 +44,26 @@ import { MappedExceptionModule } from 'nestjs-mapped-exception';
 export class UserModule {}
 ```
 
-_You also can use environment variable to set prefix with **MAPPED_EXCEPTION_PREFIX=** on your `.env` file_
+or you can setup to the entire application
+
+```ts
+// app.module.ts
+
+import { UserException } from '.modules/user/user.exception';
+import { MappedExceptionModule } from 'nestjs-mapped-exception';
+
+@Module({
+  imports: [
+    MappedExceptionModule.forRoot([UserException], {
+      prefix: 'APP_ERROR_',
+    }),
+  ],
+  ...
+})
+export class AppModule {}
+```
+
+_You also can use environment variable to set prefix with **EXCEPTION_ERROR_PREFIX=** on your `.env` file_
 
 After, we need to create our exception file
 
@@ -67,13 +86,37 @@ The status code is used for `REST` context, for `GraphQL` or `Microservice` cont
 
 Then we need to inject our exception in the service layer like this:
 
+(by Feature)
+
 ```ts
 // user.service.ts
 
 import { MappedException } from 'nestjs-mapped-exception';
+
 @Injectable()
 export class UserService {
   constructor(private readonly exception: MappedException<UserException>) {}
+
+  myMethodException() {
+    this.exception.ERRORS.MY_CUSTOM_ERROR.throw();
+  }
+}
+```
+
+(by Root)
+
+```ts
+// user.service.ts
+
+import { Inject } from '@nestjs/common';
+import { MappedException } from 'nestjs-mapped-exception';
+
+@Injectable()
+export class UserService {
+  constructor(
+    @Inject('UserException')
+    private readonly exception: MappedException<UserException>,
+  ) {}
 
   myMethodException() {
     this.exception.ERRORS.MY_CUSTOM_ERROR.throw();
@@ -87,6 +130,7 @@ And for the last step, we have to threat the exception inside the service using 
 // user.controller.ts
 
 import { MappedExceptionFilter } from 'nestjs-mapped-exception';
+
 @UseFilters(MappedExceptionFilter)
 export class UserController {
   // ...
