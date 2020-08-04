@@ -8,7 +8,7 @@ export class MappedException<T> {
   private options: MappedExceptionOptions;
 
   constructor(exception: any, options: MappedExceptionOptions) {
-    this.options = options;
+    this.options = {...options};
 
     let instance = new exception();
 
