@@ -71,5 +71,6 @@
   "files": [
     "dist/core/**/*",
     "dist/index.*"
-  ]
+  ],
+  "repository": "https://github.com/clubpetro/nestjs-mapped-exception"
 }
