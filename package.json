@@ -50,7 +50,7 @@
     "@types/jest": "^25.2.3",
     "@types/node": "^14.0.4",
     "apollo-server-fastify": "^2.15.1",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
     "copyfiles": "^2.3.0",
     "dotenv": "^8.2.0",
