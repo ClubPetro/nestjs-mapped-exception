@@ -69,15 +69,6 @@ export class MappedExceptionFilter implements ExceptionFilter {
     }
 
     if (errorLayer === ErrorLayerEnum.VALIDATION) {
-      return {
-        code: this.defaultValidationErrorPrefix,
-        message: exception.message,
-        status: HttpStatus.BAD_REQUEST,
-      };
-    }
-
-    if (errorLayer === ErrorLayerEnum.EXCEPTION) {
-      const { code, statusCode } = exception.exception;
       let message: string;
 
       if (exception?.response?.message) {
@@ -87,8 +78,18 @@ export class MappedExceptionFilter implements ExceptionFilter {
           message = exception?.response?.message;
         }
       } else {
-        message = exception?.exception?.message || '';
+        message = exception?.message || '';
       }
+
+      return {
+        code: this.defaultValidationErrorPrefix,
+        message: message,
+        status: HttpStatus.BAD_REQUEST,
+      };
+    }
+
+    if (errorLayer === ErrorLayerEnum.EXCEPTION) {
+      const { code, message, statusCode } = exception.exception;
 
       return {
         code: code.toString(),
