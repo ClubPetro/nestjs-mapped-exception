@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { throwError } from 'rxjs';
 import { QueryFailedError } from 'typeorm';
+import { isArray } from 'util';
 import { MappedExceptionError } from '../mapped-exception-error.class';
 
 enum ErrorLayerEnum {
@@ -76,7 +77,19 @@ export class MappedExceptionFilter implements ExceptionFilter {
     }
 
     if (errorLayer === ErrorLayerEnum.EXCEPTION) {
-      const { code, message, statusCode } = exception.exception;
+      const { code, statusCode } = exception.exception;
+      let message: string;
+
+      if (exception?.response?.message) {
+        if (isArray(exception?.response?.message)) {
+          message = exception?.response?.message[0];
+        } else {
+          message = exception?.response?.message;
+        }
+      } else {
+        message = exception?.exception?.message || '';
+      }
+
       return {
         code: code.toString(),
         message,
