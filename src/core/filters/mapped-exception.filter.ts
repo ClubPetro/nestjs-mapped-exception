@@ -133,15 +133,24 @@ export class MappedExceptionFilter implements ExceptionFilter {
   }
 
   private identifyErrorLayer(exception): ErrorLayerEnum {
-    if (exception instanceof QueryFailedError) {
+    if (
+      exception instanceof QueryFailedError ||
+      exception.constructor.name === 'QueryFailedError'
+    ) {
       return ErrorLayerEnum.DATABASE;
     }
 
-    if (exception instanceof BadRequestException) {
+    if (
+      exception instanceof BadRequestException ||
+      exception.constructor.name === 'BadRequestException'
+    ) {
       return ErrorLayerEnum.VALIDATION;
     }
 
-    if (exception instanceof MappedExceptionError) {
+    if (
+      exception instanceof MappedExceptionError ||
+      exception.constructor.name === 'MappedExceptionError'
+    ) {
       return ErrorLayerEnum.EXCEPTION;
     }
 
