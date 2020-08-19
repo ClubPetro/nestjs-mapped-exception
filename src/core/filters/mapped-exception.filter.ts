@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { status as GrpcStatus } from 'grpc';
 import { throwError } from 'rxjs';
 import { QueryFailedError } from 'typeorm';
 import { isArray } from 'util';
@@ -17,6 +18,38 @@ enum ErrorLayerEnum {
   APPLICATION,
   EXCEPTION,
 }
+
+const RpcStatusToHttpStatusMap = {
+  [GrpcStatus.OK]: HttpStatus.OK,
+  [GrpcStatus.CANCELLED]: HttpStatus.SERVICE_UNAVAILABLE,
+  [GrpcStatus.UNKNOWN]: HttpStatus.INTERNAL_SERVER_ERROR,
+  [GrpcStatus.INVALID_ARGUMENT]: HttpStatus.BAD_REQUEST,
+  [GrpcStatus.DEADLINE_EXCEEDED]: HttpStatus.INTERNAL_SERVER_ERROR,
+  [GrpcStatus.NOT_FOUND]: HttpStatus.NOT_FOUND,
+  [GrpcStatus.ALREADY_EXISTS]: HttpStatus.CONFLICT,
+  [GrpcStatus.PERMISSION_DENIED]: HttpStatus.FORBIDDEN,
+  [GrpcStatus.UNAUTHENTICATED]: HttpStatus.UNAUTHORIZED,
+  [GrpcStatus.RESOURCE_EXHAUSTED]: HttpStatus.TOO_MANY_REQUESTS,
+  [GrpcStatus.FAILED_PRECONDITION]: HttpStatus.PRECONDITION_FAILED,
+  [GrpcStatus.ABORTED]: HttpStatus.INTERNAL_SERVER_ERROR,
+  [GrpcStatus.OUT_OF_RANGE]: HttpStatus.BAD_REQUEST,
+  [GrpcStatus.UNIMPLEMENTED]: HttpStatus.NOT_IMPLEMENTED,
+  [GrpcStatus.UNAVAILABLE]: HttpStatus.SERVICE_UNAVAILABLE,
+  [GrpcStatus.DATA_LOSS]: HttpStatus.INTERNAL_SERVER_ERROR,
+};
+
+const HttpStatusToRpcStatusMap = {
+  [HttpStatus.BAD_REQUEST]: GrpcStatus.INVALID_ARGUMENT,
+  [HttpStatus.UNAUTHORIZED]: GrpcStatus.UNAUTHENTICATED,
+  [HttpStatus.FORBIDDEN]: GrpcStatus.PERMISSION_DENIED,
+  [HttpStatus.NOT_FOUND]: GrpcStatus.NOT_FOUND,
+  [HttpStatus.TOO_MANY_REQUESTS]: GrpcStatus.RESOURCE_EXHAUSTED,
+  [HttpStatus.BAD_GATEWAY]: GrpcStatus.UNKNOWN,
+  [HttpStatus.SERVICE_UNAVAILABLE]: GrpcStatus.UNAVAILABLE,
+  [HttpStatus.OK]: GrpcStatus.OK,
+  [HttpStatus.INTERNAL_SERVER_ERROR]: GrpcStatus.INTERNAL,
+  [HttpStatus.NOT_IMPLEMENTED]: GrpcStatus.UNIMPLEMENTED,
+};
 
 @Catch()
 export class MappedExceptionFilter implements ExceptionFilter {
@@ -33,21 +66,20 @@ export class MappedExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
+    const contextType: any = host.getType();
 
     const {
       status = HttpStatus.INTERNAL_SERVER_ERROR,
       message,
       code,
-    } = this.getStatusAndMessage(exception);
-
-    const contextType: any = host.getType();
+    } = this.getStatusAndMessage(exception, contextType);
 
     if (contextType === 'http') {
       return this.handleRestContext(request, response, status, message, code);
     }
 
     if (contextType === 'rpc') {
-      return this.handleRpcContext(code, message);
+      return this.handleRpcContext(code, message, status);
     }
 
     if (contextType === 'graphql') {
@@ -57,14 +89,18 @@ export class MappedExceptionFilter implements ExceptionFilter {
 
   private getStatusAndMessage(
     exception,
+    contextType: any,
   ): { status: number; message: string; code: string } {
     const errorLayer = this.identifyErrorLayer(exception);
 
     if (errorLayer === ErrorLayerEnum.DATABASE) {
       return {
         code: this.defaultDatabaseErrorPrefix,
-        message: exception.message,
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: this.extractMessageFromException(exception, contextType),
+        status: this.extractStatusCodeFromException(
+          exception,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
       };
     }
 
@@ -78,13 +114,17 @@ export class MappedExceptionFilter implements ExceptionFilter {
           message = exception?.response?.message;
         }
       } else {
-        message = exception?.message || '';
+        message =
+          this.extractMessageFromException(exception, contextType) || '';
       }
 
       return {
         code: this.defaultValidationErrorPrefix,
         message: message,
-        status: HttpStatus.BAD_REQUEST,
+        status: this.extractStatusCodeFromException(
+          exception,
+          HttpStatus.BAD_REQUEST,
+        ),
       };
     }
 
@@ -93,8 +133,11 @@ export class MappedExceptionFilter implements ExceptionFilter {
 
       return {
         code: code.toString(),
-        message,
-        status: statusCode,
+        message: this.extractMessageFromException(
+          exception.exception,
+          contextType,
+        ),
+        status: this.extractStatusCodeFromException(exception, statusCode),
       };
     }
 
@@ -102,17 +145,53 @@ export class MappedExceptionFilter implements ExceptionFilter {
       if (exception instanceof HttpException) {
         return {
           code: this.defaultApplicationErrorPrefix,
-          message: exception.message,
-          status: exception.getStatus(),
+          message: this.extractMessageFromException(exception, contextType),
+          status: this.extractStatusCodeFromException(
+            exception,
+            exception.getStatus(),
+          ),
         };
       }
 
       return {
         code: this.defaultApplicationErrorPrefix,
-        message: exception.message,
-        status: exception.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        message: this.extractMessageFromException(exception, contextType),
+        status: this.extractStatusCodeFromException(
+          exception,
+          exception.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        ),
       };
     }
+  }
+
+  private extractMessageFromException(exception, contextType: any): string {
+    if (contextType !== 'rpc') {
+      if (this.isRpcException(exception)) {
+        return exception.details;
+      }
+
+      return exception.message;
+    }
+
+    return exception.message || 'There was an error';
+  }
+
+  private extractStatusCodeFromException(exception, defaultStatusCode): number {
+    if (this.isRpcException(exception)) {
+      return (
+        RpcStatusToHttpStatusMap[exception.code] ||
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+    return defaultStatusCode;
+  }
+
+  private isRpcException(exception) {
+    if (exception.details && exception.code && exception.metadata) {
+      return true;
+    }
+
+    return false;
   }
 
   private handleRestContext(
@@ -131,8 +210,15 @@ export class MappedExceptionFilter implements ExceptionFilter {
     });
   }
 
-  private handleRpcContext(code: string, message: string = ''): any {
-    return throwError(new Error(`${message} [${code}]`));
+  private handleRpcContext(
+    code: string,
+    message: string = '',
+    status: number = HttpStatus.INTERNAL_SERVER_ERROR,
+  ): any {
+    return throwError({
+      message: `${message} [${code}]`,
+      code: this.getMappedRpcStatusFromHttpStatusCode(status),
+    });
   }
 
   private graphqlFormatError(status: number, message: string, code: string) {
@@ -169,5 +255,11 @@ export class MappedExceptionFilter implements ExceptionFilter {
     }
 
     return ErrorLayerEnum.APPLICATION;
+  }
+
+  private getMappedRpcStatusFromHttpStatusCode(
+    httpStatus: HttpStatus,
+  ): GrpcStatus {
+    return HttpStatusToRpcStatusMap[httpStatus] || GrpcStatus.UNKNOWN;
   }
 }
