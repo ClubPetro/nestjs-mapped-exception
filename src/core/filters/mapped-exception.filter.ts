@@ -201,7 +201,7 @@ export class MappedExceptionFilter implements ExceptionFilter {
     message: string,
     code: string,
   ) {
-    return response.code(status).send({
+    return this.setResponseCode(response, status).send({
       message,
       code,
       statusCode: status,
@@ -261,5 +261,15 @@ export class MappedExceptionFilter implements ExceptionFilter {
     httpStatus: HttpStatus,
   ): GrpcStatus {
     return HttpStatusToRpcStatusMap[httpStatus] || GrpcStatus.UNKNOWN;
+  }
+
+  private setResponseCode(response: any, code: number) {
+    if (response.code) {
+      return response.code(code);
+    } else if (response.status) {
+      return response.status(code);
+    }
+
+    return response;
   }
 }
