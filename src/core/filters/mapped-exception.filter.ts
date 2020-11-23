@@ -201,7 +201,11 @@ export class MappedExceptionFilter implements ExceptionFilter {
     message: string,
     code: string,
   ) {
-    return response.code(status).send({
+    const responseWithStatus = response.code
+      ? response.code(status)
+      : response.status(status);
+
+    return responseWithStatus.send({
       message,
       code,
       statusCode: status,
